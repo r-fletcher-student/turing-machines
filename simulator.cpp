@@ -45,16 +45,19 @@ string encode(const string& line, map<char,string> e) {
     return output;
 }
 
-string decode(const vector<string>& line, map<string, char> d) {
+/**
+ * @brief Decodes a line of encodings given a decoding scheme
+ * @param line string of codes (codes of length 3) to be decoded
+ * @param d decoding scheme.
+ * @return String of the decoded line.
+ */
+string decode(const string& line, map<string, char> d) {
     string output = "";
-    for (string s : line) {
-        output += decoding[s];
+    for (int i = 0; i<line.length(); i+=3){
+        string code = line.substr(i, 3);
+        output += d[code];
     }
     return output;
-}
-
-char decode(const string& s, map<string, char> d) {
-    return decoding[s];
 }
 
 int main(int argc, char const *argv[])
@@ -63,6 +66,8 @@ int main(int argc, char const *argv[])
 
     string line;
     getline(cin, line);
+
+    cout << decode(line, decoding) << endl;
 
     return 0;
 }
