@@ -10,7 +10,6 @@
 
 using namespace std;
 
-//000100000100000100000100000000101000100001100000100001100000000101001001100010100001000100010100000000101001001100000100001000100000100000000101001001100001100001100001100000000101
 const string ENCODING = "0=000|1=001|_=010|#=100|;=101";
 const string L = "10";
 const string R = "00";
@@ -31,6 +30,9 @@ string intToBs(int i) {
     return bin;
 }
 
+/**
+ * @brief Represents a singular instruction
+ */
 struct Instruction {
     int startState;
     char read;
@@ -48,7 +50,7 @@ struct Instruction {
 };
 
 /**
- * @brief Retireves encoding of symbols.
+ * @brief Retrieves encoding of symbols.
  * @param scheme line describing the encodign scheme used.
  */
 void getEncoding(const string& scheme) {
@@ -64,20 +66,6 @@ void getEncoding(const string& scheme) {
         encoding[symbol] =  code;
         decoding[code] = symbol;
     }
-}
-
-/**
- * @brief Encodes a string given an encoding scheme.
- * @param line line to be encoded.
- * @param encoding the encoding scheme to be used.
- * @return Encoded line.
- */
-string encode(const string& line, map<char,string> e) {
-    string output = "";
-    for (char c : line) {
-        output += e[c];
-    }
-    return output;
 }
 
 /**
@@ -164,13 +152,39 @@ map<int, map<char, Instruction>> assignStates(const list<Instruction>& insts) {
     return states;
 }
 
+// TESTING FUNCTION - char-instruction map to string
+string poongM(map<char, Instruction> m) {
+    stringstream ss;
+    for (const auto& [key, value] : m) {
+        ss << "[" << key << "]" << value.toString() << ", ";
+    }
+    return ss.str();
+}
+
+// TESTING FUNCTION - state-instructionMap to string (turing machine)
+string poongTM(map<int, map<char, Instruction>> tm) {
+    stringstream ss;
+    for (const auto& [key, value] : tm) {
+        ss << "State " << key << ": " << endl << poongM(value) << endl;
+    }
+    return ss.str();
+}
+
+/**
+ * @brief Simulates a turing machine
+ * @param input the input tape to the turning machine (string)
+ * @param turingMachine a map describing the turing machine
+ * @return Final state of the Turing Machine
+ */
 string simulate(const string& input, map<int, map<char, Instruction>> turingMachine) {
     deque<char> tape(input.begin(), input.end());
+
+    //cout << poongTM(turingMachine) << endl;   //testing :D
 
     int i = 0;
     int currState = 0;
     int head = 0;
-    while (i < 10) {
+    while (i < 1000000) {
         i++;
         if (currState == 1 || currState == 2) break;
 
@@ -197,7 +211,13 @@ string simulate(const string& input, map<int, map<char, Instruction>> turingMach
     }
 
     string w(tape.begin(), tape.begin() + head);
+    while (!w.empty() && w.front() =='_') w.erase(w.begin());
+
     string v(tape.begin()+head, tape.end());
+    while (!v.empty() && v.back() == '_') v.pop_back();
+    if (v.empty()) v = "_";
+
+
     return w + "#" + intToBs(currState) + "#" + v;
 }
 
