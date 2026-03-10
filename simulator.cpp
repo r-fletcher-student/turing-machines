@@ -17,20 +17,6 @@ const string R = "00";
 map<char, string> encoding;
 map<string, char> decoding;
 
-int poongCount = 0;
-void poong() {
-    poongCount++;
-    cout << "poong" << poongCount << endl;
-}
-void poong(string s) {
-    poongCount++;
-    cout << "poong" << poongCount << ": " << s << endl;
-}
-void poong(deque<char> d) {
-    string s(d.begin(), d.end());
-    poong(s);
-}
-
 /**
  * @brief Converts integer to binary string without leading zeros
  */
@@ -60,22 +46,6 @@ struct Instruction {
         return intToBs(startState) + "#" + read + "#" + intToBs(nextState) + "#" + write + "#" + dir;
     }
 };
-
-string poong(map<char, Instruction> m) {
-    stringstream ss;
-    for (const auto& [key, value] : m) {
-        ss << "[" << key << "]" << value.toString() << ", ";
-    }
-    return ss.str();
-}
-
-string poong(map<int, map<char, Instruction>> m) {
-    stringstream ss;
-    for (const auto& [key, value] : m) {
-        ss << "State " << key << ": " << endl << poong(value) << endl;
-    }
-    return ss.str();
-}
 
 /**
  * @brief Retireves encoding of symbols.
@@ -190,7 +160,6 @@ map<int, map<char, Instruction>> assignStates(const list<Instruction>& insts) {
         } else {
             states[it->startState][it->read] = *it;
         }
-        cout << it->startState << ": " << poong(states[it->startState]) << endl;
     }
     return states;
 }
@@ -198,20 +167,14 @@ map<int, map<char, Instruction>> assignStates(const list<Instruction>& insts) {
 string simulate(const string& input, map<int, map<char, Instruction>> turingMachine) {
     deque<char> tape(input.begin(), input.end());
 
-    //cout << poong(turingMachine);
-
     int i = 0;
     int currState = 0;
     int head = 0;
-    while (i < 10) { //01_ s0
+    while (i < 10) {
         i++;
         if (currState == 1 || currState == 2) break;
 
         Instruction inst = turingMachine[currState][tape[head]];
-        cout << "head: " << head << ", tape at head: " << tape[head] << endl;
-        cout << "inst: " << poong(turingMachine[currState]) << endl;
-        cout << "other inst: " << inst.toString() << endl;
-
         tape[head] = inst.write;
 
         // next state
