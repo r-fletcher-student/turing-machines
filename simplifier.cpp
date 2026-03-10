@@ -11,15 +11,35 @@
 using namespace std;
 
 int Qmax = 0;
+const string S = "0";
+const string L = "10";
+const string LL = "11";
+const string R = "00";
+const string RR = "01";
 
+string intToBs(int i) {
+    if (i == 0) return "0";
+
+    std::string bin;
+    while (i > 0) {
+        bin = char('0' + (i % 2)) + bin;
+        i /= 2;
+    }
+    return bin;
+}
 struct Instruction {
     int startState;
     char read;
     int nextState;
     char write;
-    int dir;
+    string dir;
+
     string toString() {
-        return to_string(startState) + "#" + read + "#" + to_string(nextState) + "#" + write + "#" + to_string(dir);
+        return to_string(startState) + "#" + read + "#" + to_string(nextState) + "#" + write + "#" + dir;
+    }
+
+    string format() {
+        return intToBs(startState) + "#" + read + "#" + intToBs(nextState) + "#" + write + "#" + dir;
     }
 };
 
@@ -78,6 +98,7 @@ int maxQ(list<Instruction> insts) {
     int max = 0;
     for (const Instruction& i : insts) {
         if (i.startState > max) max = i.startState;
+        if (i.nextState > max) max = i.nextState;
     }
     return max;
 }
@@ -98,17 +119,85 @@ list<Instruction> splitInstructions(const string& line) {
             a[1][0],
             bsToInt(a[2]),
             a[3][0],
-            bsToInt(a[4])
+            a[4]
         });
     }
 
     return insts;
 }
 
+/**
+ * @brief Converts S, LL and RR instructions to standard L,R by ading intermediate states
+ * @param isnts list of instructions
+ * @return List of Instructions (including intermediate ones)
+ */
 void simplifyInstructions(list<Instruction>& insts) {
-    for (int i = 0; i<insts.size(); i++) {
-        if ()
+    for (auto it = insts.begin(); it != insts.end(); ++it) {
+        //cout << it->toString() << endl;
+        //cout << Qmax << endl;
+
+        // Stationary
+        if (it->dir == S) {
+            Qmax++;
+            for (char c : {'_', '0', '1'}) {
+                insts.push_back({
+                    Qmax,
+                    c,
+                    it->nextState,
+                    c,
+                    L
+                });
+            }
+
+            it->dir = R;
+            it->nextState = Qmax;
+
+        } else 
+        // Double Left
+        if (it->dir == LL) {
+            Qmax++;
+            for (char c : {'_', '0', '1'}) {
+                insts.push_back({
+                    Qmax,
+                    c,
+                    it->nextState,
+                    c,
+                    L
+                });
+            }
+
+            it->dir = L;
+            it->nextState = Qmax;
+
+        } else 
+        // Double Right
+        if (it->dir == RR) {
+            Qmax++;
+            for (char c : {'_', '0', '1'}) {
+                insts.push_back({
+                    Qmax,
+                    c,
+                    it->nextState,
+                    c,
+                    R
+                });
+            }
+
+            it->dir = R;
+            it->nextState = Qmax;
+        }
+
+        //cout << Qmax << endl;
+        //cout << it->toString() << endl;
     }
+}
+
+string outputFormat(list<Instruction> insts) {
+    string out = "";
+    for (auto it = insts.begin(); it != insts.end(); ++it) {
+        out+= it->format() + ";";
+    }
+    return out;
 }
 
 int main(int argc, char const *argv[])
@@ -119,11 +208,12 @@ int main(int argc, char const *argv[])
     getline(cin, line);
 
     insts = splitInstructions(line);
+    Qmax = maxQ(insts);
     sortPriority(insts);
 
-    for (auto i : insts) {
-        cout << i.toString() << endl;
-    }
+    simplifyInstructions(insts);
+
+    cout << outputFormat(insts) << endl;
 
     return 0;
 }
