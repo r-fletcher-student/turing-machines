@@ -17,6 +17,9 @@ const string LL = "11";
 const string R = "00";
 const string RR = "01";
 
+/**
+ * @brief Converts integer to binary string without leading zeros
+ */
 string intToBs(int i) {
     if (i == 0) return "0";
 
@@ -133,9 +136,6 @@ list<Instruction> splitInstructions(const string& line) {
  */
 void simplifyInstructions(list<Instruction>& insts) {
     for (auto it = insts.begin(); it != insts.end(); ++it) {
-        //cout << it->toString() << endl;
-        //cout << Qmax << endl;
-
         // Stationary
         if (it->dir == S) {
             Qmax++;
@@ -186,9 +186,6 @@ void simplifyInstructions(list<Instruction>& insts) {
             it->dir = R;
             it->nextState = Qmax;
         }
-
-        //cout << Qmax << endl;
-        //cout << it->toString() << endl;
     }
 }
 
