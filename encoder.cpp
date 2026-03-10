@@ -5,7 +5,7 @@
 
 using namespace std;
 
-map<char,string> get_encoding(string scheme);
+map<char,string> getEncoding(string scheme);
 string encode(string, map<char, string>);
 
 int main()
@@ -15,7 +15,7 @@ int main()
     string scheme;
     getline(cin, scheme);
 
-    encoding = get_encoding(scheme);
+    encoding = getEncoding(scheme);
 
     string line;
     getline(cin, line);
@@ -30,7 +30,7 @@ int main()
  * @param scheme line describing the encodign scheme used.
  * @return Map containing <symbol, encoding>
  */
-map<char, string> get_encoding(string scheme) {
+map<char, string> getEncoding(string scheme) {
     map<char, string> encoding;
     stringstream ss(scheme);
     string pair;
