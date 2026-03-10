@@ -7,26 +7,6 @@
 
 using namespace std;
 
-map<char,string> getEncoding(string scheme);
-string encode(string, map<char, string>);
-
-int main()
-{
-    map<char, string> encoding;
-
-    string scheme;
-    getline(cin, scheme);
-
-    encoding = getEncoding(scheme);
-
-    string line;
-    getline(cin, line);
-
-    cout << encode(line, encoding) << endl;
-
-    return 0;
-}
-
 /**
  * @brief Retireves encoding of symbols.
  * @param scheme line describing the encodign scheme used.
@@ -61,4 +41,21 @@ string encode(string line, map<char,string> encoding) {
         output += encoding[c];
     }
     return output;
+}
+
+int main()
+{
+    map<char, string> encoding;
+
+    string scheme;
+    getline(cin, scheme);
+
+    encoding = getEncoding(scheme);
+
+    string line;
+    getline(cin, line);
+
+    cout << encode(line, encoding) << endl;
+
+    return 0;
 }
