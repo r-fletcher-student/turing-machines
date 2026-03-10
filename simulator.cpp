@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string>
 #include <sstream>
-#include <map>
+#include <unordered_map>
 #include <vector>
 #include <list>
 #include <deque>
@@ -13,8 +13,8 @@ using namespace std;
 const string ENCODING = "0=000|1=001|_=010|#=100|;=101";
 const string L = "10";
 const string R = "00";
-map<char, string> encoding;
-map<string, char> decoding;
+unordered_map<char, string> encoding;
+unordered_map<string, char> decoding;
 
 /**
  * @brief Converts integer to binary string without leading zeros
@@ -43,10 +43,6 @@ struct Instruction {
     string toString() const {
         return to_string(startState) + "#" + read + "#" + to_string(nextState) + "#" + write + "#" + dir;
     }
-
-    string format() {
-        return intToBs(startState) + "#" + read + "#" + intToBs(nextState) + "#" + write + "#" + dir;
-    }
 };
 
 /**
@@ -74,7 +70,7 @@ void getEncoding(const string& scheme) {
  * @param d decoding scheme.
  * @return String of the decoded line.
  */
-string decode(const string& line, map<string, char> d) {
+string decode(const string& line, unordered_map<string, char>& d) {
     string output = "";
     for (int i = 0; i<line.length(); i+=3){
         string code = line.substr(i, 3);
@@ -138,8 +134,8 @@ list<Instruction> splitInstructions(const string& line) {
  * @param insts list of instructions
  * @return Map of (state)-(instruction vector) pairs
  */
-map<int, map<char, Instruction>> assignStates(const list<Instruction>& insts) {
-    map<int, map<char, Instruction>> states;
+unordered_map<int, unordered_map<char, Instruction>> assignStates(const list<Instruction>& insts) {
+    unordered_map<int, unordered_map<char, Instruction>> states;
 
     for (auto it = insts.begin(); it != insts.end(); ++it) {
         auto it2 = states.find(it->startState);
@@ -153,7 +149,7 @@ map<int, map<char, Instruction>> assignStates(const list<Instruction>& insts) {
 }
 
 // TESTING FUNCTION - char-instruction map to string
-string poongM(map<char, Instruction> m) {
+string poongM(unordered_map<char, Instruction> m) {
     stringstream ss;
     for (const auto& [key, value] : m) {
         ss << "[" << key << "]" << value.toString() << ", ";
@@ -162,7 +158,7 @@ string poongM(map<char, Instruction> m) {
 }
 
 // TESTING FUNCTION - state-instructionMap to string (turing machine)
-string poongTM(map<int, map<char, Instruction>> tm) {
+string poongTM(unordered_map<int, unordered_map<char, Instruction>> tm) {
     stringstream ss;
     for (const auto& [key, value] : tm) {
         ss << "State " << key << ": " << endl << poongM(value) << endl;
@@ -176,7 +172,7 @@ string poongTM(map<int, map<char, Instruction>> tm) {
  * @param turingMachine a map describing the turing machine
  * @return Final state of the Turing Machine
  */
-string simulate(const string& input, map<int, map<char, Instruction>> turingMachine) {
+string simulate(const string& input, unordered_map<int, unordered_map<char, Instruction>>& turingMachine) {
     deque<char> tape(input.begin(), input.end());
 
     //cout << poongTM(turingMachine) << endl;   //testing :D
@@ -207,7 +203,13 @@ string simulate(const string& input, map<int, map<char, Instruction>> turingMach
             }
         }
 
-        string s(tape.begin(), tape.end());
+        while (tape.size() > 1 && tape.back() == '_' && head < (int)tape.size() - 1)
+            tape.pop_back();
+
+        while (tape.size() > 1 && tape.front() == '_' && head > 0) {
+            tape.pop_front();
+            head--;
+        }
     }
 
     string w(tape.begin(), tape.begin() + head);
@@ -229,7 +231,7 @@ int main(int argc, char const *argv[])
     getline(cin, line);
 
     list<Instruction> insts = splitInstructions(line);
-    map<int, map<char, Instruction>> turingMachine = assignStates(insts);
+    unordered_map<int, unordered_map<char, Instruction>> turingMachine = assignStates(insts);
 
     string inputTape;
     getline(cin, inputTape);
