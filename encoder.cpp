@@ -12,7 +12,7 @@ using namespace std;
  * @param scheme line describing the encodign scheme used.
  * @return Map containing <symbol, encoding>
  */
-map<char, string> getEncoding(string scheme) {
+map<char, string> getEncoding(const string& scheme) {
     map<char, string> encoding;
     stringstream ss(scheme);
     string pair;
@@ -35,7 +35,7 @@ map<char, string> getEncoding(string scheme) {
  * @param encoding the encoding scheme to be used.
  * @return Encoded line.
  */
-string encode(string line, map<char,string> encoding) {
+string encode(const string& line, map<char,string> encoding) {
     string output = "";
     for (char c : line) {
         output += encoding[c];
