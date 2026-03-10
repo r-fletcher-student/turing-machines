@@ -83,7 +83,7 @@ int bsToInt(const string& b) {
  * @brief Sorts vector of instructions into priority order.
  * @param insts Vector of instructions
  */
-void sortPriority(std::list<Instruction>& insts) {
+void sortPriority(list<Instruction>& insts) {
     insts.sort([](const Instruction& a, const Instruction& b) {
 
         if (a.startState != b.startState)
@@ -96,7 +96,7 @@ void sortPriority(std::list<Instruction>& insts) {
 /**
  * @brief Returns the maximum state number in a vector of instructions.
  */
-int maxQ(list<Instruction> insts) {
+int maxQ(const list<Instruction>& insts) {
     int max = 0;
     for (const Instruction& i : insts) {
         if (i.startState > max) max = i.startState;
