@@ -6,15 +6,27 @@
 #include <vector>
 #include <queue>
 #include <algorithm>
+#include <list>
 
 using namespace std;
 
 int Qmax = 0;
 
-int priority(const string& c) {
-    if (c == "_") return 0;
-    if (c == "0") return 1;
-    if (c == "1") return 2;
+struct Instruction {
+    int startState;
+    char read;
+    int nextState;
+    char write;
+    int dir;
+    string toString() {
+        return to_string(startState) + "#" + read + "#" + to_string(nextState) + "#" + write + "#" + to_string(dir);
+    }
+};
+
+int priority(char c) {
+    if (c == '_') return 0;
+    if (c == '0') return 1;
+    if (c == '1') return 2;
     return 3;
 }
 
@@ -49,44 +61,69 @@ int bsToInt(const string& b) {
  * @brief Sorts vector of instructions into priority order.
  * @param insts Vector of instructions
  */
-void sortPriority(vector<string>& insts) {
-    sort( insts.begin(), insts.end(), 
-    [](const string& a, const string& b) {
+void sortPriority(std::list<Instruction>& insts) {
+    insts.sort([](const Instruction& a, const Instruction& b) {
 
-        auto A = split(a, '#');
-        auto B = split(b, '#');
+        if (a.startState != b.startState)
+            return a.startState < b.startState;
 
-        int stateA = bsToInt(A[0]);
-        int stateB = bsToInt(B[0]);
-
-        if (stateA != stateB) return stateA < stateB;
-
-        return priority(A[1]) < priority(B[1]);
-
+        return priority(a.read) < priority(b.read);
     });
 }
 
-int maxQ(vector<string> insts) {
+/**
+ * @brief Returns the maximum state number in a vector of instructions.
+ */
+int maxQ(list<Instruction> insts) {
     int max = 0;
-    for (const string& i : insts) {
-        auto inst = split(i, '#');
-        int state = bsToInt(inst[0]);
-        if (state > max) max = state;
+    for (const Instruction& i : insts) {
+        if (i.startState > max) max = i.startState;
     }
     return max;
 }
 
+/**
+ * @brief Splits a string of all instructions into individual Instruction structures.
+ * @param line string of instructions
+ * @return list of Instructions
+ */
+list<Instruction> splitInstructions(const string& line) {
+    list<Instruction> insts;
+
+    vector<string> instStrings = split(line, ';');
+    for (const string& iS : instStrings) {
+        auto a = split(iS, '#');
+        insts.push_back({
+            bsToInt(a[0]),
+            a[1][0],
+            bsToInt(a[2]),
+            a[3][0],
+            bsToInt(a[4])
+        });
+    }
+
+    return insts;
+}
+
+void simplifyInstructions(list<Instruction>& insts) {
+    for (int i = 0; i<insts.size(); i++) {
+        if ()
+    }
+}
+
 int main(int argc, char const *argv[])
 {
-    vector<string> insts;
+    list<Instruction> insts;
 
     string line;
     getline(cin, line);
 
-    insts = split(line, ';');
-    Qmax = maxQ(insts);
-    cout << Qmax << endl;
+    insts = splitInstructions(line);
     sortPriority(insts);
+
+    for (auto i : insts) {
+        cout << i.toString() << endl;
+    }
 
     return 0;
 }
